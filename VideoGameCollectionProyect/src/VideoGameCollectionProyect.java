@@ -1,9 +1,7 @@
-package proyecto_final_bdii;
-
 import java.sql.*;
 import java.util.*;
 
-public class VideogameCollection {
+public class VideoGameCollectionProyect {
     static Connection conexion = null;
     static int userID = 0;
     static String access_type = "";
@@ -1269,38 +1267,79 @@ public class VideogameCollection {
         return valores;
     }
 
-    public static void listarColeccionUsuario(int userId) {
-        String sql = "SELECT g.game_id, g.game_name, p.platform_name, gc.rating, " +
-                "DATE_FORMAT(gc.date_added, '%Y-%m-%d') as fecha_agregado " +
-                "FROM game_collection gc " +
-                "JOIN games g ON gc.game_id = g.game_id " +
-                "JOIN platform p ON g.platform_id = p.platform_id " +
-                "WHERE gc.user_id = ? AND gc.active = TRUE " +
-                "ORDER BY g.game_name";
+    public static void listarColeccionUsuario() {
+        Scanner scanner = new Scanner(System.in);
+        int opc, userId;
+        System.out.println("Desea revisar su coleccion (1/0)?");
+        opc = scanner.nextInt();
+         if (opc == 1) {
+             userId = userID;
+             String sql = "SELECT g.game_id, g.game_name, p.platform_name, gc.rating, " +
+                     "DATE_FORMAT(gc.date_added, '%Y-%m-%d') as fecha_agregado " +
+                     "FROM game_collection gc " +
+                     "JOIN games g ON gc.game_id = g.game_id " +
+                     "JOIN platform p ON g.platform_id = p.platform_id " +
+                     "WHERE gc.user_id = ? AND gc.active = TRUE " +
+                     "ORDER BY g.game_name";
 
-        try (PreparedStatement pstmt = conexion.prepareStatement(sql)) {
-            pstmt.setInt(1, userId);
-            ResultSet rs = pstmt.executeQuery();
+             try (PreparedStatement pstmt = conexion.prepareStatement(sql)) {
+                 pstmt.setInt(1, userId);
+                 ResultSet rs = pstmt.executeQuery();
 
-            System.out.println("\n=== COLECCIÓN DE VIDEOJUEGOS ===");
-            System.out.printf("%-5s %-30s %-20s %-10s %-15s%n",
-                    "ID", "JUEGO", "PLATAFORMA", "RATING", "FECHA AGREGADO");
-            System.out.println("---------------------------------------------------------------");
+                 System.out.println("\n=== COLECCIÓN DE VIDEOJUEGOS ===");
+                 System.out.printf("%-5s %-30s %-20s %-10s %-15s%n",
+                         "ID", "JUEGO", "PLATAFORMA", "RATING", "FECHA AGREGADO");
+                 System.out.println("---------------------------------------------------------------");
 
-            while (rs.next()) {
-                System.out.printf("%-5d %-30s %-20s %-10d %-15s%n",
-                        rs.getInt("game_id"),
-                        rs.getString("game_name"),
-                        rs.getString("platform_name"),
-                        rs.getInt("rating"),
-                        rs.getString("fecha_agregado"));
-            }
+                 while (rs.next()) {
+                     System.out.printf("%-5d %-30s %-20s %-10d %-15s%n",
+                             rs.getInt("game_id"),
+                             rs.getString("game_name"),
+                             rs.getString("platform_name"),
+                             rs.getInt("rating"),
+                             rs.getString("fecha_agregado"));
+                 }
 
-            // Mostrar estadísticas
-            mostrarEstadisticasColeccion(userId);
-        } catch (SQLException e) {
-            System.err.println("Error al listar colección: " + e.getMessage());
-        }
+                 // Mostrar estadísticas
+                 mostrarEstadisticasColeccion(userId);
+             } catch (SQLException e) {
+                 System.err.println("Error al listar colección: " + e.getMessage());
+             }
+         } else {
+             System.out.println("Ingrese el id del usuario que desee ver su coleccion");
+             userId = scanner.nextInt();
+             String sql = "SELECT g.game_id, g.game_name, p.platform_name, gc.rating, " +
+                     "DATE_FORMAT(gc.date_added, '%Y-%m-%d') as fecha_agregado " +
+                     "FROM game_collection gc " +
+                     "JOIN games g ON gc.game_id = g.game_id " +
+                     "JOIN platform p ON g.platform_id = p.platform_id " +
+                     "WHERE gc.user_id = ? AND gc.active = TRUE " +
+                     "ORDER BY g.game_name";
+
+             try (PreparedStatement pstmt = conexion.prepareStatement(sql)) {
+                 pstmt.setInt(1, userId);
+                 ResultSet rs = pstmt.executeQuery();
+
+                 System.out.println("\n=== COLECCIÓN DE VIDEOJUEGOS ===");
+                 System.out.printf("%-5s %-30s %-20s %-10s %-15s%n",
+                         "ID", "JUEGO", "PLATAFORMA", "RATING", "FECHA AGREGADO");
+                 System.out.println("---------------------------------------------------------------");
+
+                 while (rs.next()) {
+                     System.out.printf("%-5d %-30s %-20s %-10d %-15s%n",
+                             rs.getInt("game_id"),
+                             rs.getString("game_name"),
+                             rs.getString("platform_name"),
+                             rs.getInt("rating"),
+                             rs.getString("fecha_agregado"));
+                 }
+
+                 // Mostrar estadísticas
+                 mostrarEstadisticasColeccion(userId);
+             } catch (SQLException e) {
+                 System.err.println("Error al listar colección: " + e.getMessage());
+             }
+         }
     }
 
     private static void mostrarEstadisticasColeccion(int userId) throws SQLException {
@@ -1557,7 +1596,7 @@ public class VideogameCollection {
         int opcion;
         do {
             System.out.println("\n=== MI COLECCIÓN ===");
-            System.out.println("1. Ver mi colección");
+            System.out.println("1. Ver alguna colección");
             System.out.println("2. Agregar juego a mi colección");
             System.out.println("3. Modificar rating de un juego");
             System.out.println("4. Eliminar juego de mi colección");
@@ -1569,7 +1608,7 @@ public class VideogameCollection {
 
             switch(opcion) {
                 case 1:
-                    listarColeccionUsuario(userID);
+                    listarColeccionUsuario();
                     break;
                 case 2:
                     addGame_Collection();
@@ -1590,9 +1629,8 @@ public class VideogameCollection {
         int opcion;
         do {
             System.out.println("\n=== CONSULTAS Y REPORTES ===");
-            System.out.println("1. Listar mi colección completa");
-            System.out.println("2. Ver juegos más populares");
-            System.out.println("3. Top 5 juegos con mejor rating");
+            System.out.println("1. Ver juegos más populares");
+            System.out.println("2. Top 5 juegos con mejor rating");
             System.out.println("0. Volver al menú principal");
             System.out.print("Seleccione una opción: ");
 
@@ -1601,12 +1639,9 @@ public class VideogameCollection {
 
             switch(opcion) {
                 case 1:
-                    listarColeccionUsuario(usuarioID);
-                    break;
-                case 2:
                     listarJuegosPopulares();
                     break;
-                case 3:
+                case 2:
                     listarTop5MejorRating();
                     break;
             }
@@ -1634,7 +1669,7 @@ public class VideogameCollection {
 
             switch(opcion) {
                 case 1:
-                    //verBitacora();
+                    despliegaTabla("log","*", "1 GROUP By timestamp DESC");
                     break;
                 case 2:
                     try {
@@ -1941,40 +1976,121 @@ public class VideogameCollection {
     // Ultima actualizacion
 
     public static void restaurarBaseDatos() throws SQLException {
-        Statement stmt = conexion.createStatement();
+        boolean autoCommitOriginal = conexion.getAutoCommit();
+        conexion.setAutoCommit(false);
 
-        // Eliminar datos de las tablas
-        stmt.executeUpdate("DELETE FROM game_collection;");
-        stmt.executeUpdate("DELETE FROM games;");
-        stmt.executeUpdate("DELETE FROM platform;");
-        stmt.executeUpdate("DELETE FROM users;");
+        try (Statement stmt = conexion.createStatement()) {
+            // 1. Deshabilitar restricciones y triggers temporalmente
+            stmt.execute("SET FOREIGN_KEY_CHECKS = 0");
+            stmt.execute("SET @DISABLE_TRIGGERS = TRUE");
 
-        // Ejecutar comandos del log desde el último CHECKP
+            // 2. Guardar copia temporal del estado actual
+            guardarCopiaTemporal(stmt);
+
+            // 3. Truncar tablas (mejor que DELETE para resetear auto-increment)
+            truncarTablas(stmt);
+
+            // 4. Restaurar datos preservando IDs originales
+            restaurarDatosDesdeLog(stmt);
+
+            // 5. Restaurar el log original
+            restaurarLogOriginal(stmt);
+
+            // 6. Crear nuevo checkpoint
+            crearNuevoCheckpoint(stmt);
+
+            // 7. Reactivar restricciones
+            stmt.execute("SET FOREIGN_KEY_CHECKS = 1");
+            stmt.execute("SET @DISABLE_TRIGGERS = FALSE");
+
+            conexion.commit();
+            System.out.println("Restauración completada exitosamente.");
+
+        } catch (SQLException e) {
+            conexion.rollback();
+            System.err.println("Error durante la restauración. Cambios revertidos.");
+            throw new SQLException("No se pudo completar la restauración: " + e.getMessage(), e);
+        } finally {
+            try {
+                conexion.setAutoCommit(autoCommitOriginal);
+            } catch (SQLException e) {
+                System.err.println("Error al restaurar auto-commit: " + e.getMessage());
+            }
+        }
+    }
+
+    // Métodos auxiliares
+    private static void guardarCopiaTemporal(Statement stmt) throws SQLException {
+        stmt.executeUpdate("CREATE TEMPORARY TABLE temp_games AS SELECT * FROM games");
+        stmt.executeUpdate("CREATE TEMPORARY TABLE temp_users AS SELECT * FROM users");
+        stmt.executeUpdate("CREATE TEMPORARY TABLE temp_platform AS SELECT * FROM platform");
+        stmt.executeUpdate("CREATE TEMPORARY TABLE temp_collection AS SELECT * FROM game_collection");
+        stmt.executeUpdate("CREATE TEMPORARY TABLE temp_log AS SELECT * FROM log");
+    }
+
+    private static void truncarTablas(Statement stmt) throws SQLException {
+        stmt.executeUpdate("TRUNCATE TABLE game_collection");
+        stmt.executeUpdate("TRUNCATE TABLE games");
+        stmt.executeUpdate("TRUNCATE TABLE platform");
+        stmt.executeUpdate("TRUNCATE TABLE users");
+        stmt.executeUpdate("TRUNCATE TABLE log");
+    }
+
+    private static void restaurarDatosDesdeLog(Statement stmt) throws SQLException {
         String sql = """
-        SELECT sql_instruction FROM log
-        WHERE id > (SELECT MAX(id) FROM log WHERE action_type = 'CHECKP')
-        ORDER BY id;
+        SELECT sql_instruction 
+        FROM temp_log
+        WHERE log_id > (SELECT MAX(log_id) FROM temp_log WHERE action_type = 'CHECKP')
+        AND action_type IN ('INSERT', 'UPDATE')
+        ORDER BY 
+            CASE WHEN table_name = 'platform' THEN 1
+                 WHEN table_name = 'users' THEN 2
+                 WHEN table_name = 'games' THEN 3
+                 ELSE 4 END,
+            log_id;
     """;
 
-        ResultSet rs = stmt.executeQuery(sql);
-        while (rs.next()) {
-            String instruccion = rs.getString("sql_instruction");
-            if (instruccion != null && !instruccion.isBlank()) {
-                try (Statement ejecutar = conexion.createStatement()) {
-                    ejecutar.executeUpdate(instruccion);
-                } catch (SQLException e) {
-                    System.err.println("Error al ejecutar: " + instruccion);
-                    e.printStackTrace();
+        try (ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                String instruccion = adaptarInstruccionSQL(rs.getString("sql_instruction"));
+                if (instruccion != null && !instruccion.isBlank()) {
+                    try {
+                        stmt.executeUpdate(instruccion);
+                    } catch (SQLException e) {
+                        System.err.println("Advertencia: No se pudo ejecutar - " + instruccion);
+                        System.err.println("Motivo: " + e.getMessage());
+                    }
                 }
             }
         }
+    }
 
-        // Insertar nuevo checkpoint
-        stmt.executeUpdate("INSERT INTO log (user_id, action_type, table_name, record_id, sql_instruction) " +
-                "VALUES (" + userID + ", 'CHECKP', 'None', 0, 'None');");
+    private static String adaptarInstruccionSQL(String original) {
+        // Eliminar cláusulas ON DUPLICATE KEY si existen
+        return original.replaceAll(" ON DUPLICATE KEY UPDATE.*$", "")
+                .replaceAll("INSERT IGNORE", "INSERT");
+    }
 
-        stmt.close();
-        System.out.println("Restauración completada.");
+    private static void restaurarLogOriginal(Statement stmt) throws SQLException {
+        stmt.executeUpdate("INSERT INTO log SELECT * FROM temp_log");
+        stmt.executeUpdate("DROP TEMPORARY TABLE temp_log");
+        // Limpiar otras tablas temporales
+        stmt.executeUpdate("DROP TEMPORARY TABLE IF EXISTS temp_games");
+        stmt.executeUpdate("DROP TEMPORARY TABLE IF EXISTS temp_users");
+        stmt.executeUpdate("DROP TEMPORARY TABLE IF EXISTS temp_platform");
+        stmt.executeUpdate("DROP TEMPORARY TABLE IF EXISTS temp_collection");
+    }
+
+    private static void crearNuevoCheckpoint(Statement stmt) throws SQLException {
+        String adminCheck = "SELECT user_id FROM users WHERE access_type = 'admin' AND active = 1 LIMIT 1";
+        try (ResultSet rs = stmt.executeQuery(adminCheck)) {
+            if (rs.next()) {
+                int adminId = rs.getInt(1);
+                String insertCheckpoint = "INSERT INTO log (user_id, action_type, table_name, record_id, sql_instruction) " +
+                        "VALUES (" + adminId + ", 'CHECKP', 'SYSTEM', 0, 'Restauración completada')";
+                stmt.executeUpdate(insertCheckpoint);
+            }
+        }
     }
 
 }
